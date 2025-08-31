@@ -3,99 +3,72 @@
  * Student number: 222582731
  * */
 package za.co.tt.serviceTest;
-
-
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import za.co.tt.domain.Address;
-import za.co.tt.factory.AddressFactory;
-import za.co.tt.service.IAddressService;
-
-import java.time.LocalDate;
-import java.util.List;
+import za.co.tt.service.impl.AddressServiceImpl;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static za.co.tt.serviceTest.UserServiceImplTest.user;
 
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @SpringBootTest
-public class AddressServiceImplTest {
-//
-//    @Autowired
-//    private IAddressService service;
-//
-//    private Address address1;
-//
-//    @BeforeEach
-//    void setUp() {
-//        address1 = AddressFactory.createAddress(
-//                1010L,
-//                "Hanover St",
-//                "Cape Town",
-//                "Western Cape",
-//                8000,
-//                "South Africa",
-//                true,
-//                null,
-//                LocalDate.now(),
-//                LocalDate.now()
-//        );
-//
-//        service.create(address1);
-//    }
-//
-//    @Test
-//    void create() {
-//        Address created = service.create(address1);
-//        assertNotNull(created, "Address should be created successfully");
-//        System.out.println("Created: " + created);
-//    }
-//
-//    @Test
-//    void read() {
-//        Address read = service.read(address1.getId());
-//        assertNotNull(read, "Address should be found");
-//        assertEquals(address1.getStreet(), read.getStreet(), "Street should match");
-//        System.out.println("Read: " + read);
-//    }
-//
-//    @Test
-//    void update() {
-//        Address updateData = new Address.Builder()
-//                .setId(address1.getId())
-//                .setStreet("456 New Street")
-//                .setCity(address1.getCity())
-//                .setProvince(address1.getProvince())
-//                .setPostalCode(address1.getPostalCode())
-//                .setCountry(address1.getCountry())
-//                .build();
-//
-//        Address updated = service.update(updateData);
-//
-//        Address readBack = service.read(address1.getId());
-//        assertNotNull(updated, "Updated address should not be null");
-//        assertEquals("456 New Street", readBack.getStreet(), "Street should be updated");
-//        System.out.println("Updated: " + readBack);
-//    }
-//
-//    @Test
-//    void delete() {
-//        service.delete(address1.getId());
-//
-//
-//        Address deleted = service.read(address1.getId());
-//        assertNull(deleted, "Address should be deleted");
-//        System.out.println("Deleted address with ID: " + address1.getId());
-//    }
-//
-//    @Test
-//    void findAll() {
-//        List<Address> allAddresses = service.findAll();
-//        assertNotNull(allAddresses, "List of addresses should not be null");
-//        assertTrue(allAddresses.size() > 0, "There should be at least one address");
-//        allAddresses.forEach(System.out::println);
-//        System.out.println("All addresses found.");
-//    }
+class AddressServiceImplTest {
 
-} //Have an error because of the Tyre/Rim Service
+    @Autowired
+    private AddressServiceImpl addressServiceImpl;
 
+    private static final Address address = new Address.Builder()
+            .setStreet("Richmond Street")
+            .setCity("Cape Town")
+            .setProvince("Strand")
+            .setPostalCode(7141)
+            .setCountry("South Africa")
+            .setUser(user)
+            .build();
+
+    @Test
+    void a_create() {
+        System.out.print("Created: ");
+        Address created = addressServiceImpl.create(address);
+        address.setAddressId(created.getAddressId());
+        assertNotNull(created, "Address should be created");
+        System.out.println(created);
+    }
+
+    @Test
+    void b_read() {
+        System.out.println("Read: ");
+        Address read = addressServiceImpl.read(address.getAddressId());
+        assertEquals(read.getAddressId(), address.getAddressId(), "IDs should match");
+        System.out.println(read);
+    }
+
+    @Test
+    void c_update() {
+        System.out.println("Updated: ");
+        Address updated = addressServiceImpl.update(new Address.Builder().copy(address)
+                .setStreet("12 Flick Street")
+                .build());
+        assertNotNull(updated, "Address should be updated");
+        assertEquals("12 Flick Street", updated.getStreet(), "Street should be updated");
+        System.out.println(updated);
+    }
+
+    @Test
+    void d_delete() {
+        System.out.println("Deleted: ");
+        boolean success = addressServiceImpl.delete(address.getAddressId());
+        assertTrue(success, "Address should be deleted");
+        System.out.println(success);
+    }
+
+    @Test
+    void e_findAll() {
+        System.out.println("Get all: ");
+        System.out.println(addressServiceImpl.getAll());
+    }
+}

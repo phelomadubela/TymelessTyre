@@ -8,12 +8,14 @@ package za.co.tt.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import za.co.tt.domain.Address;
-import java.util.*;
+import java.util.List;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, Long> {
-
-
-    Optional<Address> findByPostalCode(String postalCode);
+    Address findByStreetAndCity(String street, String city);
+    Address findByPostalCode(int postalCode);
+    Address findByStreetAndPostalCode(String street, int postalCode);
+    Address findByCityAndPostalCode(String city, int postalCode);
     List<Address> findAllByCity(String city);
+    boolean existsByAddressId(Long addressId);
 }

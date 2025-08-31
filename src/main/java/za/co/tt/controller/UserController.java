@@ -16,36 +16,32 @@ public class UserController {
     private UserServiceImpl service;
 
     @Autowired
-    UserController(UserServiceImpl service) {
+    public UserController(UserServiceImpl service) {
         this.service = service;
     }
 
     @PostMapping("/create")
     public User create(@RequestBody User user) {
-        return service.save(user);
+        return service.create(user);
     }
 
     @GetMapping("/read/{id}")
     public User read(@PathVariable Long id) {
-        return service.findById(id).orElse(null);
+        return service.read(id);
     }
 
     @PostMapping("/update")
     public User update(@RequestBody User user) {
-        return service.update(user.getUserId(), user);
+        return service.update(user);
     }
 
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable Long id) {
-        service.deleteById(id);
-        return true;
+        return service.delete(id);
     }
 
     @GetMapping("/getAll")
     public List<User> getAll() {
-        return service.findAll();
+        return service.getAll();
     }
 }
-
-
-

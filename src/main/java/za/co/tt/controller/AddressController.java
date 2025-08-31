@@ -17,7 +17,7 @@ public class AddressController {
     private AddressServiceImpl service;
 
     @Autowired
-    AddressController(AddressServiceImpl service) {
+    public AddressController(AddressServiceImpl service) {
         this.service = service;
     }
 
@@ -38,15 +38,11 @@ public class AddressController {
 
     @DeleteMapping("/delete/{id}")
     public boolean delete(@PathVariable Long id) {
-        service.delete(id);
-        return true;
+        return service.delete(id);
     }
 
     @GetMapping("/getAll")
     public List<Address> getAll() {
-        return service.findAll();
+        return service.getAll();
     }
 }
-
-
-

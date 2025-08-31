@@ -13,6 +13,6 @@ public interface IAddressService {
     Address create(Address address);
     Address read(Long addressId);
     Address update(Address address);
-    void delete(Long addressId);
-    List<Address> findAll();
+    boolean delete(Long addressId);
+    List<Address> getAll();
 }

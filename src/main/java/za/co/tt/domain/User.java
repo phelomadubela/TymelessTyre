@@ -4,9 +4,9 @@
  * */
 
 package za.co.tt.domain;
-
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -20,33 +20,35 @@ public class User {
     private String firstName;
     private String lastName;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
     private String password;
     private String phone;
 
-    @CreationTimestamp
-    private LocalDate createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDate createdAt = LocalDate.now();
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+    @Column(nullable = false)
     private Boolean isActive = true;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Address> addresses;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Payment> payments;
 
 
-     @OneToMany(mappedBy = "user")
-     private List<Order> orders;
+//     @OneToMany(mappedBy = "user")
+//     private List<Order> orders;
 
-     @OneToMany(mappedBy = "user")
-     private List<Reviews> reviews;
+//     @OneToMany(mappedBy = "user")
+//     private List<Reviews> reviews;
 
 
-      @OneToOne(mappedBy = "user")
-      private Cart cart;
+//      @OneToOne(mappedBy = "user")
+//      @JoinColumn(name = "cartId", nullable = false)
+//      private Cart cart;
 
 
     public User(){
@@ -65,9 +67,9 @@ public class User {
         this.isActive = builder.isActive;
         this.addresses = builder.addresses;
         this.payments = builder.payments;
-        this.orders = builder.orders;
-        this.reviews = builder.reviews;
-        this.cart = builder.cart;
+        //this.orders = builder.orders;
+        //this.reviews = builder.reviews;
+        //this.cart = builder.cart;
     }
 
 
@@ -117,15 +119,15 @@ public class User {
         return payments;
     }
 
-    public List<Order> getOrders(){
-        return orders;
-    }
-    public List<Reviews> getReviews(){
-        return reviews;
-    }
-    public Cart getCart(){
-        return  cart;
-    }
+//    public List<Order> getOrders(){
+//        return orders;
+//    }
+//    public List<Reviews> getReviews(){
+//        return reviews;
+//    }
+//    public Cart getCart(){
+//        return  cart;
+//    }
 
 
     @Override
@@ -142,10 +144,14 @@ public class User {
                 ", createdAt=" + createdAt +
                 ", addresses=" + addresses +
                 ", payments=" + payments +
-                ", orders=" + orders +
-                ", reviews=" + reviews +
-                ", cart=" + cart +
+                //", orders=" + orders +
+               // ", reviews=" + reviews +
+               // ", cart=" + cart +
                 '}';
+    }
+
+    public void setUserId(long userId) {
+
     }
 
     public static class Builder{
@@ -160,9 +166,9 @@ public class User {
         private Boolean isActive = true;
         private List<Address> addresses;
         private List<Payment> payments;
-        private List<Order> orders;
-        private List<Reviews> reviews;
-        private Cart cart;
+        //private List<Order> orders;
+        //private List<Reviews> reviews;
+       // private Cart cart;
 
 
 
@@ -210,18 +216,18 @@ public class User {
             this.payments = payments;
             return  this;
         }
-        public Builder setOrder(List<Order> orders){
-            this.orders = orders;
-            return this;
-        }
-        public  Builder setReviews(List<Reviews> reviews){
-            this.reviews = reviews;
-            return this;
-        }
-        public Builder setCart(Cart cart){
-            this.cart = cart;
-            return this;
-        }
+//        public Builder setOrder(List<Order> orders){
+//            this.orders = orders;
+//            return this;
+//        }
+//        public  Builder setReviews(List<Reviews> reviews){
+//            this.reviews = reviews;
+//            return this;
+//        }
+//        public Builder setCart(Cart cart){
+//            this.cart = cart;
+//            return this;
+//        }
 
         public Builder copy(User user) {
             this.userId = user.userId;
@@ -235,9 +241,9 @@ public class User {
             this.isActive = user.isActive;
             this.addresses = user.addresses;
             this.payments = user.payments;
-            this.orders = user.orders;
-            this.reviews = user.reviews;
-            this.cart = user.cart;
+            //this.orders = user.orders;
+            //this.reviews = user.reviews;
+            //this.cart = user.cart;
             return this;
         }
 

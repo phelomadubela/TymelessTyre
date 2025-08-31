@@ -7,80 +7,50 @@ package za.co.tt.service.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import za.co.tt.domain.User;
-import za.co.tt.domain.UserRole;
 import za.co.tt.repository.UserRepository;
 import za.co.tt.service.IUserService;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements IUserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository repository;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserServiceImpl(UserRepository repository) {
+        this.repository = repository;
     }
 
     @Override
-    public User update(Long userId, User updateData) {
-        return userRepository.findById(userId)
-                .map(existing -> {
-                    User updated = new User.Builder()
-                            .setUserId(existing.getUserId())
-                            .setFirstName(updateData.getFirstName() != null ? updateData.getFirstName() : existing.getFirstName())
-                            .setLastName(existing.getLastName())
-                            .setEmail(existing.getEmail())
-                            .setPassword(existing.getPassword())
-                            .setPhone(existing.getPhone())
-                            .setRole(existing.getRole())
-                            //.setIsActive(existing.isActive())
-                            .build();
-                    return userRepository.save(updated);
-                })
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    public User create(User user) {
+        return repository.save(user);
     }
 
-
+    @Override
+    public User read(Long userId) {
+        return repository.findById(userId).orElse(null);
+    }
 
     @Override
-    public User save(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User cannot be null");
+    public User update(User user) {
+        if (user != null && repository.existsById(user.getUserId())) {
+            return repository.save(user);
         }
-        return userRepository.save(user);
-    }
-
-
-    @Override
-    public Optional<User> findById(Long userId) {
-        return userRepository.findById(userId);
+        return null;
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findUserByEmail(email);
+    public boolean delete(Long userId) {
+        if (repository.existsById(userId)) {
+            repository.deleteById(userId);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public Optional<User> findByPhone(String phone) {
-        return userRepository.findByPhone(phone);
-    }
-
-    @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public List<User> findAllByRole(UserRole role) {
-        return userRepository.findAllByRole(role);
-    }
-
-    @Override
-    public void deleteById(Long userId) {
-        userRepository.deleteById(userId);
+    public List<User> getAll() {
+        return repository.findAll();
     }
 }

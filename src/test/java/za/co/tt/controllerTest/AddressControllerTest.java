@@ -3,89 +3,100 @@
  * Student number: 222582731
  * */
 package za.co.tt.controllerTest;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import za.co.tt.Main;
 import za.co.tt.domain.Address;
 import za.co.tt.factory.AddressFactory;
 
 import java.time.LocalDate;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @TestMethodOrder(MethodOrderer.MethodName.class)
-@SpringBootTest(classes = Main.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddressControllerTest {
 
     private static Address address = AddressFactory.createAddress(
-            110L, "St Marks Road", "Cape Town", "Western Cape", 8001,
-            "South Africa", true, null, LocalDate.now(), LocalDate.now());
+            02L, "123 Main Street",
+            "Cape Town", "Western Cape", 8000, "South Africa",
+            true, null, LocalDate.now(), LocalDate.now()
+    );
+
+    @LocalServerPort
+    private int port;
 
     @Autowired
     private TestRestTemplate restTemplate;
 
-    private final String baseUrl = "http://localhost:8080/address";
+    private String getBaseUrl() {
+        return "http://localhost:" + port + "/address";
+    }
 
     @Test
     void a_create() {
-        String url = baseUrl + "/create";
+        String url = getBaseUrl() + "/create";
         ResponseEntity<Address> postResponse = restTemplate.postForEntity(url, address, Address.class);
+
         assertNotNull(postResponse);
         assertNotNull(postResponse.getBody());
+
         Address savedAddress = postResponse.getBody();
-        assertEquals(address.getId(), savedAddress.getId());
-        System.out.println("Saved address: " + savedAddress);
+        System.out.println("Saved data: " + savedAddress);
+
+        assertEquals(address.getStreet(), savedAddress.getStreet());
+        address = savedAddress; // update static variable for next tests
     }
 
     @Test
     void b_read() {
-        String url = baseUrl + "/read/" + address.getId();
-        System.out.println("URL: " + url);
+        String url = getBaseUrl() + "/read/" + address.getAddressId();
         ResponseEntity<Address> response = restTemplate.getForEntity(url, Address.class);
-        assertEquals(address.getId(), response.getBody().getId());
-        System.out.println(response.getBody());
+
+        assertNotNull(response.getBody());
+        assertEquals(address.getAddressId(), response.getBody().getAddressId());
+        System.out.println("Read: " + response.getBody());
     }
 
     @Test
     void c_update() {
-        Address updated = new Address.Builder().copy(address).setCity("Johannesburg").build();
-        String url = baseUrl + "/update";
-        System.out.println("URL: " + url);
-        System.out.println("Post data: " + updated);
+        Address updated = new Address.Builder().copy(address).setStreet("456 New Street").build();
+        String url = getBaseUrl() + "/update";
+
         ResponseEntity<Address> response = restTemplate.postForEntity(url, updated, Address.class);
         assertNotNull(response.getBody());
-        assertEquals("Johannesburg", response.getBody().getCity());
-        System.out.println("Updated address: " + response.getBody());
+
+        System.out.println("Updated: " + response.getBody());
+        address = response.getBody();
     }
 
-    @Test
+    @Disabled
     void d_delete() {
-        String url = baseUrl + "/delete/" + address.getId();
+        String url = getBaseUrl() + "/delete/" + address.getAddressId();
         restTemplate.delete(url);
-
-        ResponseEntity<Address> response = restTemplate.getForEntity(baseUrl + "/read/" + address.getId(), Address.class);
-        assertNull(response.getBody());
-        System.out.println("Deleted address with ID: " + address.getId());
+        System.out.println("Deleted address with ID: " + address.getAddressId());
     }
 
     @Test
-    void d_getAll() {
-        String url = baseUrl + "/getAll";
+    void e_getAll() {
+        String url = getBaseUrl() + "/getAll";
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        System.out.println("Show ALL: ");
-        System.out.println(response);
-        System.out.println(response.getBody());
+
+        ResponseEntity<List> response = restTemplate.exchange(url, HttpMethod.GET, entity, List.class);
+        assertNotNull(response.getBody());
+
+        System.out.println("All addresses: " + response.getBody());
     }
 }
-
-

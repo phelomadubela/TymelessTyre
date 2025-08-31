@@ -15,16 +15,33 @@ import java.util.List;
 
 public class UserFactory {
 
-    public static User createUser(Long userId, String firstName, String lastName, String email, String password,
+    public static User createUser(Long userId,
+                                  String firstName,
+                                  String lastName,
+                                  String email,
+                                  String password,
                                   String phone,
-                                  LocalDate createdAt, Boolean isActive,
-                                  List<Address> addresses, List<Payment> payments, UserRole role) {
-        if (userId == null || Helper.isNullOrEmpty(firstName) ||
-                Helper.isNullOrEmpty(lastName) || !Helper.isValidEmail(email) ||
-                Helper.isNullOrEmpty(password) || !Helper.isValidMobile(phone) ||
+                                  LocalDate createdAt,
+                                  UserRole role,
+                                  Boolean isActive,
+                                  List<Address> addresses,
+                                  List<Payment> payments) {
+
+        if (Helper.isNullOrEmpty(firstName) ||
+                Helper.isNullOrEmpty(lastName) ||
+                !Helper.isValidEmail(email) ||
+                Helper.isNullOrEmpty(password) ||
+                !Helper.isValidMobile(phone) ||
                 createdAt == null ||
-                isActive == null || addresses == null || payments == null || role == null) {
+                role == null ||
+                isActive == null) {
             return null;
+        }
+
+        if (addresses != null) {
+            for (Address address : addresses) {
+                address.setUser(null);
+            }
         }
 
         return new User.Builder()
